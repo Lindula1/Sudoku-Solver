@@ -1,5 +1,7 @@
 import time as t
-import sys
+import sys, subprocess
+import os
+
 
 board = [
     [7,8,0,4,0,0,1,2,0],
@@ -13,15 +15,6 @@ board = [
     [0,4,9,2,0,6,0,0,7]
 ]
 
-def delete_last_line():
-    "Use this function to delete the last line in the STDOUT"
-    for i in range(1,10):
-        #cursor up one line
-        sys.stdout.write('\x2b[1A')
-
-        #delete last line
-        sys.stdout.write('\x1b[2K')
-
 def Solve(bo):
     find = findEmpty(bo)
     if not find:
@@ -32,7 +25,9 @@ def Solve(bo):
     for i in range(1, 10):
         if valid(bo, i, (row, col)):
             bo[row][col] = i
-            printBoard(bo)
+            printBoard(board)
+            t.sleep(0.1)
+            os.system("cls||clear")
             if Solve(bo):
                 return True
             bo[row][col] = 0
@@ -86,6 +81,5 @@ def findEmpty(bo):
     return None
 
 printBoard(board)
-delete_last_line()
-#Solve(board)
-#printBoard(board)
+Solve(board)
+printBoard(board)
