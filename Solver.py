@@ -1,6 +1,7 @@
 import time as t
 import sys, subprocess
 import os
+import random
 
 
 board = [
@@ -23,11 +24,15 @@ def Solve(bo):
         row, col = find
 
     for i in range(1, 10):
+        dumBo = bo
+        dumBo[row][col] = i
+        print("Solving...")
+        printBoard(dumBo)
+        t.sleep(0.05)
+        os.system("cls||clear")
+
         if valid(bo, i, (row, col)):
             bo[row][col] = i
-            printBoard(board)
-            t.sleep(0.1)
-            os.system("cls||clear")
             if Solve(bo):
                 return True
             bo[row][col] = 0
@@ -80,6 +85,20 @@ def findEmpty(bo):
     
     return None
 
+letters = "abcdefghijklmnopqrstuvwxyz. ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+result = ""
+target = "Generating Sudoku..."
+for letter in target:
+    for i in letters:
+        print(result + i, end="\r")
+        if i == letter:
+            result += i
+            break
+        t.sleep(0.002)
+        
+
 printBoard(board)
+t.sleep(0.7)
 Solve(board)
+print("Solved")
 printBoard(board)
