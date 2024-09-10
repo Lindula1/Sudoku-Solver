@@ -3,18 +3,28 @@ import sys, subprocess
 import os
 import random
 
+k = 0
+base  = 3
+side  = base*base
 
-board = [
-    [7,8,0,4,0,0,1,2,0],
-    [6,0,0,0,7,5,0,0,9],
-    [0,0,0,6,0,1,0,7,8],
-    [0,0,7,0,4,0,2,6,0],
-    [0,0,1,0,5,0,9,3,0],
-    [9,0,4,0,6,0,0,0,5],
-    [0,7,0,3,0,0,0,1,2],
-    [1,2,0,0,0,7,4,0,0],
-    [0,4,9,2,0,6,0,0,7]
-]
+# pattern for a baseline valid solution
+def pattern(r,c): return (base*(r%base)+r//base+c)%side
+
+# randomize rows, columns and numbers (of valid base pattern)
+from random import sample
+def shuffle(s): return sample(s,len(s)) 
+rBase = range(base) 
+rows  = [ g*base + r for g in shuffle(rBase) for r in shuffle(rBase) ] 
+cols  = [ g*base + c for g in shuffle(rBase) for c in shuffle(rBase) ]
+nums  = shuffle(range(1,base*base+1))
+
+# produce board using randomized baseline pattern
+board = [ [nums[pattern(r,c)] for c in cols] for r in rows ]
+
+squares = side*side
+empties = squares * 3//4
+for p in sample(range(squares),empties):
+    board[p//side][p%side] = 0
 
 def Solve(bo):
     find = findEmpty(bo)
@@ -24,18 +34,19 @@ def Solve(bo):
         row, col = find
 
     for i in range(1, 10):
-        dumBo = bo
-        dumBo[row][col] = i
-        print("Solving...")
-        printBoard(dumBo)
-        t.sleep(0.05)
-        os.system("cls||clear")
-
         if valid(bo, i, (row, col)):
             bo[row][col] = i
             if Solve(bo):
                 return True
             bo[row][col] = 0
+        global k
+        k += 1
+        '''
+        print("Solving...")
+        printBoard(bo)
+        t.sleep(0.008)
+        os.system("cls||clear")
+        '''
     return False
 
 def valid(bo, num, pos):
@@ -64,18 +75,7 @@ def printBoard(bo):
     for j in range(len(bo)):
         brd += " ".join(str(v) for v in bo[j]) + "\n"
     print(brd, end="\r")
-    """
-    for i in range(len(bo)):
-        if i % 3 == 0 and i != 0:
-            print("- - - - - - - - - - - - - ")
-        for j in range(len(bo[0])):
-            if j  % 3 == 0 and j != 0:
-                print(" | ", end="")
-            if j == 8:
-                print(bo[i][j])
-            else:
-                print(str(bo[i][j]) + " ", end="")
-    """
+
 
 def findEmpty(bo):
     for i in range(len(bo)):
@@ -87,7 +87,7 @@ def findEmpty(bo):
 
 letters = "abcdefghijklmnopqrstuvwxyz. ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 result = ""
-target = "Generating Sudoku..."
+target = "Generating Sudoku"
 for letter in target:
     for i in letters:
         print(result + i, end="\r")
@@ -98,7 +98,7 @@ for letter in target:
         
 
 printBoard(board)
-t.sleep(0.7)
+t.sleep(1.3)
 Solve(board)
-print("Solved")
+print("Solved in", k, "iterations")
 printBoard(board)
